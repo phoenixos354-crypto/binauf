@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users — hanya bisa baca/tulis profil sendiri
+    // Server (Admin SDK) bisa bypass rules ini
+    match /users/{email} {
+      allow read, write: if false; // semua akses lewat server API
+    }
+
+    // Talents & Projects — read/write hanya lewat server API
+    match /talents/{docId} {
+      allow read, write: if false;
+    }
+
+    match /projects/{docId} {
+      allow read, write: if false;
+    }
+  }
+}
