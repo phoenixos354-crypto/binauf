@@ -87,7 +87,7 @@ export default function SignIn() {
               textAlign: 'center', fontSize: 12, color: 'var(--text-dim)',
               marginTop: 20, lineHeight: 1.7
             }}>
-              Dengan masuk, kamu menyetujui bahwa kamu adalah anggota jamaah LDII
+              Dengan masuk, kamu menyetujui bahwa kamu adalah anggota Komunitas
               yang terdaftar dan bersedia mengikuti verifikasi.
             </p>
           </div>
