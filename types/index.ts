@@ -10,7 +10,7 @@ export interface Talent {
   email: string;
   photoURL?: string;
   loc: string;
-  cat: string;
+  cat: string[];   // multi kategori
   skills: string[];
   bio: string;
   portfolio: string;

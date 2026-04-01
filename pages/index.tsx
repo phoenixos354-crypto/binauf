@@ -5,11 +5,16 @@ import Head from 'next/head';
 import Navbar from '@/components/Navbar';
 import TalentCard from '@/components/TalentCard';
 import SkillInput from '@/components/SkillInput';
+import CategoryInput from '@/components/CategoryInput';
 import ToastContainer, { showToast } from '@/components/Toast';
 import { Talent, Project } from '@/types';
 
-// ─── CATEGORIES ───────────────────────────────────────────────
-const CATEGORIES = ['Web Developer','Mobile Developer','UI/UX Designer','Digital Marketing','UMKM / Wirausaha','Data / AI','Lainnya'];
+// ─── CATEGORIES (untuk filter dropdown) ───────────────────────────────────────
+const PRESET_FILTER_CATEGORIES = [
+  'Web Developer','Mobile Developer','UI/UX Designer','Digital Marketing',
+  'UMKM / Wirausaha','Data / AI','Graphic Designer','Content Creator',
+  'Network / IT Support','Videografi / Fotografi','Akuntansi / Keuangan','Copywriting',
+];
 const PROJECT_TYPES = ['IT','UMKM','Training'] as const;
 const TYPE_META = {
   IT:       { label: '💻 Project IT',       color: '#5eead4' },
@@ -106,12 +111,12 @@ export default function Home() {
   const [filterCat, setFilterCat] = useState('');
 
   // Register form
-  const [regForm, setRegForm] = useState({ name: session?.user?.name || '', wa: '', loc: '', cat: '', skills: [] as string[], bio: '', portfolio: '', status: 'open' });
+  const [regForm, setRegForm] = useState({ name: session?.user?.name || '', wa: '', loc: '', cat: [] as string[], skills: [] as string[], bio: '', portfolio: '', status: 'open' });
   const [regLoading, setRegLoading] = useState(false);
 
   // Edit form
   const [editOpen, setEditOpen] = useState(false);
-  const [editForm, setEditForm] = useState<Partial<Talent> & { skills: string[] }>({ skills: [] });
+  const [editForm, setEditForm] = useState<Partial<Talent> & { skills: string[]; cat: string[] }>({ skills: [], cat: [] });
 
   // Post project modal
   const [postOpen, setPostOpen] = useState(false);
@@ -152,13 +157,14 @@ export default function Home() {
     const q = search.toLowerCase();
     const matchQ = !q || t.name.toLowerCase().includes(q) || t.skills.join(' ').toLowerCase().includes(q) || t.loc.toLowerCase().includes(q) || t.cat.toLowerCase().includes(q);
     const matchS = !filterStatus || t.status === filterStatus;
-    const matchC = !filterCat || t.cat === filterCat;
+    const matchC = !filterCat || (Array.isArray(t.cat) ? t.cat.includes(filterCat) : t.cat === filterCat);
     return matchQ && matchS && matchC;
   });
 
   // ── ANALYTICS DATA ──
   const catCounts = Object.entries(
-    talents.reduce((acc, t) => { acc[t.cat] = (acc[t.cat] || 0) + 1; return acc; }, {} as Record<string, number>)
+    talents.flatMap(t => Array.isArray(t.cat) ? t.cat : [t.cat])
+      .reduce((acc, c) => { acc[c] = (acc[c] || 0) + 1; return acc; }, {} as Record<string, number>)
   ).sort((a, b) => b[1] - a[1]);
 
   const skillCounts = Object.entries(
@@ -167,8 +173,8 @@ export default function Home() {
 
   // ── SUBMIT TALENT ──
   async function submitTalent() {
-    if (!regForm.name || !regForm.wa || !regForm.loc || !regForm.cat) {
-      showToast('Isi semua field yang wajib (*)', 'error'); return;
+    if (!regForm.name || !regForm.wa || !regForm.loc || regForm.cat.length === 0) {
+      showToast('Isi semua field yang wajib (*) termasuk minimal 1 kategori', 'error'); return;
     }
     setRegLoading(true);
     try {
@@ -188,7 +194,10 @@ export default function Home() {
   function openEdit() {
     const myTalent = talents.find(t => t.id === userTalentId);
     if (!myTalent) return;
-    setEditForm({ ...myTalent });
+    setEditForm({
+      ...myTalent,
+      cat: Array.isArray(myTalent.cat) ? myTalent.cat : [myTalent.cat],
+    });
     setEditOpen(true);
   }
 
@@ -317,7 +326,11 @@ export default function Home() {
               </select>
               <select className="form-select" style={{ minWidth: 170 }} value={filterCat} onChange={e => setFilterCat(e.target.value)}>
                 <option value="">Semua Kategori</option>
-                {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                {/* Gabungkan preset + kategori custom dari data */}
+                {Array.from(new Set([
+                  ...PRESET_FILTER_CATEGORIES,
+                  ...talents.flatMap(t => Array.isArray(t.cat) ? t.cat : [t.cat])
+                ])).sort().map(c => <option key={c}>{c}</option>)}
               </select>
             </div>
 
@@ -421,12 +434,9 @@ export default function Home() {
                     <label className="form-label">Lokasi <span>*</span></label>
                     <input className="form-input" value={regForm.loc} onChange={e => setRegForm(f => ({ ...f, loc: e.target.value }))} placeholder="Nganjuk, Jawa Timur" />
                   </div>
-                  <div className="form-group">
-                    <label className="form-label">Kategori Utama <span>*</span></label>
-                    <select className="form-select" value={regForm.cat} onChange={e => setRegForm(f => ({ ...f, cat: e.target.value }))}>
-                      <option value="">Pilih kategori...</option>
-                      {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-                    </select>
+                  <div className="form-group" style={{ gridColumn: '1/-1' }}>
+                    <label className="form-label">Kategori Keahlian <span>*</span></label>
+                    <CategoryInput value={regForm.cat} onChange={cat => setRegForm(f => ({ ...f, cat }))} />
                   </div>
                   <div className="form-group" style={{ gridColumn: '1/-1' }}>
                     <label className="form-label">Keahlian / Skill</label>
@@ -514,10 +524,8 @@ export default function Home() {
             <input className="form-input" value={editForm.loc || ''} onChange={e => setEditForm(f => ({ ...f, loc: e.target.value }))} />
           </div>
           <div className="form-group">
-            <label className="form-label">Kategori</label>
-            <select className="form-select" value={editForm.cat || ''} onChange={e => setEditForm(f => ({ ...f, cat: e.target.value }))}>
-              {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-            </select>
+            <label className="form-label">Kategori Keahlian</label>
+            <CategoryInput value={editForm.cat || []} onChange={cat => setEditForm(f => ({ ...f, cat }))} />
           </div>
           <div className="form-group">
             <label className="form-label">Skills</label>

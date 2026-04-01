@@ -26,7 +26,7 @@ interface TalentCardProps {
 
 export default function TalentCard({ talent, delay = 0, isOwner, onEdit }: TalentCardProps) {
   const status = STATUS_CONFIG[talent.status] || STATUS_CONFIG.open;
-  const emoji = CAT_EMOJI[talent.cat] || '👤';
+  const emoji = CAT_EMOJI[Array.isArray(talent.cat) ? talent.cat[0] : talent.cat] || '👤';
   const waLink = `https://wa.me/62${talent.wa.replace(/^0/, '').replace(/\D/g, '')}`;
 
   return (
@@ -63,7 +63,9 @@ export default function TalentCard({ talent, delay = 0, isOwner, onEdit }: Talen
               }}>Kamu</span>
             )}
           </div>
-          <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{talent.cat}</div>
+          <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+            {(Array.isArray(talent.cat) ? talent.cat : [talent.cat]).join(' · ')}
+          </div>
           <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 2 }}>📍 {talent.loc}</div>
         </div>
         <span className={`badge ${status.cls}`} style={{ flexShrink: 0, fontSize: 10 }}>
