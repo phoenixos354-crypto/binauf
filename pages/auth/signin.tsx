@@ -1,6 +1,6 @@
-import { signIn, getServerSession } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import { GetServerSideProps } from 'next';
-import { getServerSession as getSession } from 'next-auth';
+import { getServerSession } from 'next-auth';
 import { authOptions } from '@/pages/api/auth/[...nextauth]';
 import Head from 'next/head';
 
@@ -105,7 +105,7 @@ export default function SignIn() {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const session = await getSession(ctx.req, ctx.res, authOptions);
+  const session = await getServerSession(ctx.req, ctx.res, authOptions);
   if (session) return { redirect: { destination: '/', permanent: false } };
   return { props: {} };
 };
