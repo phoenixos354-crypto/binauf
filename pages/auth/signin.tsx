@@ -40,7 +40,7 @@ export default function SignIn() {
               fontFamily: 'var(--font-display)', fontSize: 28,
               marginBottom: 8, lineHeight: 1.2,
             }}>
-              Jamaah <span style={{ color: 'var(--emerald)' }}>Talent</span> Hub
+              <span style={{ color: 'var(--emerald)' }}>Bin</span> Auf
             </h1>
             <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>
               Platform ekosistem digital<br />
@@ -56,7 +56,7 @@ export default function SignIn() {
             }}>
               <p style={{ fontSize: 13, color: 'var(--gold)', lineHeight: 1.6 }}>
                 <strong>🔒 Platform Tertutup</strong><br />
-                Hanya untuk anggota jamaah LDII yang terverifikasi.
+                Hanya untuk anggota Komunitas yang terverifikasi.
                 Setelah masuk, kamu akan diminta menjawab kuis verifikasi.
               </p>
             </div>
