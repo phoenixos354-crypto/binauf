@@ -238,7 +238,7 @@ export default function Home() {
   // ─────────────────────────────────────────
   return (
     <>
-      <Head><title>Jamaah Talent Hub — EPM DPW LDII Jatim</title></Head>
+      <Head><title>Bin Auf — EPM DPW LDII Jatim</title></Head>
       <div className="grid-bg" />
       <div style={{ position: 'fixed', width: 500, height: 500, borderRadius: '50%', top: -120, right: -120, background: 'rgba(16,185,122,0.05)', filter: 'blur(80px)', pointerEvents: 'none', zIndex: 0 }} />
       <div style={{ position: 'fixed', width: 400, height: 400, borderRadius: '50%', bottom: 80, left: -120, background: 'rgba(212,168,67,0.04)', filter: 'blur(80px)', pointerEvents: 'none', zIndex: 0 }} />
